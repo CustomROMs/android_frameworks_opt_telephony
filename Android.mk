@@ -38,6 +38,10 @@ LOCAL_STATIC_JAVA_LIBRARIES := \
 LOCAL_MODULE_TAGS := optional
 LOCAL_MODULE := telephony-common
 
+ifneq ($(BOARD_RIL_CLASS),)
+LOCAL_SRC_FILES += $(call find-other-java-files,$(BOARD_RIL_CLASS))
+endif
+
 LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/Android.mk
 
 ifeq ($(EMMA_INSTRUMENT_FRAMEWORK),true)

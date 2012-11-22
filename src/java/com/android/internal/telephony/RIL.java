@@ -4297,7 +4297,7 @@ public class RIL extends BaseCommands implements CommandsInterface {
      * There is a WAKE_LOCK_TIMEOUT to release the lock, though it shouldn't
      * happen often.
      */
-    private void acquireWakeLock(RILRequest rr, int wakeLockType) {
+    protected void acquireWakeLock(RILRequest rr, int wakeLockType) {
         synchronized (rr) {
             if (rr.mWakeLockType != INVALID_WAKELOCK) {
                 Rlog.d(RILJ_LOG_TAG, "Failed to aquire wakelock for " + rr.serialString());
@@ -4429,7 +4429,7 @@ public class RIL extends BaseCommands implements CommandsInterface {
      * @param error is the RIL_Errno sent back
      * @param loggable true means to print all requests in mRequestList
      */
-    private void clearRequestList(int error, boolean loggable) {
+    protected void clearRequestList(int error, boolean loggable) {
         RILRequest rr;
         synchronized (mRequestList) {
             int count = mRequestList.size();
@@ -4452,7 +4452,7 @@ public class RIL extends BaseCommands implements CommandsInterface {
         }
     }
 
-    private RILRequest findAndRemoveRequestFromList(int serial) {
+    protected RILRequest findAndRemoveRequestFromList(int serial) {
         RILRequest rr = null;
         synchronized (mRequestList) {
             rr = mRequestList.get(serial);
