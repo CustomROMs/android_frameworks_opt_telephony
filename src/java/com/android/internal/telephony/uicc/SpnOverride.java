@@ -36,7 +36,7 @@ public class SpnOverride {
 
 
     static final String LOG_TAG = "SpnOverride";
-    static final String PARTNER_SPN_OVERRIDE_PATH ="etc/spn-conf.xml";
+    static final String PARTNER_SPN_OVERRIDE_PATH ="etc/selective-spn-conf.xml";
     static final String OEM_SPN_OVERRIDE_PATH = "telephony/spn-conf.xml";
 
     SpnOverride () {
