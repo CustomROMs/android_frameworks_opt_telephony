@@ -2179,15 +2179,8 @@ public class ServiceStateTracker extends Handler {
 
         String wfcVoiceSpnFormat = null;
         String wfcDataSpnFormat = null;
-        int combinedRegState = getCombinedRegState();
-        if (mPhone.getImsPhone() != null && mPhone.getImsPhone().isWifiCallingEnabled()
-                && (combinedRegState == ServiceState.STATE_IN_SERVICE)) {
-            // In Wi-Fi Calling mode show SPN or PLMN + WiFi Calling
-            //
-            // 1) Show SPN + Wi-Fi Calling If SIM has SPN and SPN display condition
-            //    is satisfied or SPN override is enabled for this carrier
-            //
-            // 2) Show PLMN + Wi-Fi Calling if there is no valid SPN in case 1
+        if (mPhone.getImsPhone() != null && mPhone.getImsPhone().isWifiCallingEnabled()) {
+            // In Wi-Fi Calling mode show SPN+WiFi
 
             String[] wfcSpnFormats = mPhone.getContext().getResources().getStringArray(
                     com.android.internal.R.array.wfcSpnFormats);
@@ -2212,6 +2205,7 @@ public class ServiceStateTracker extends Handler {
             wfcDataSpnFormat = wfcSpnFormats[dataIdx];
         }
 
+        int combinedRegState = getCombinedRegState();
         if (mPhone.isPhoneTypeGsm()) {
             // The values of plmn/showPlmn change in different scenarios.
             // 1) No service but emergency call allowed -> expected
@@ -2276,19 +2270,13 @@ public class ServiceStateTracker extends Handler {
 
             if (!TextUtils.isEmpty(spn) && !TextUtils.isEmpty(wfcVoiceSpnFormat) &&
                     !TextUtils.isEmpty(wfcDataSpnFormat)) {
-                // Show SPN + Wi-Fi Calling If SIM has SPN and SPN display condition
-                // is satisfied or SPN override is enabled for this carrier.
+                // In Wi-Fi Calling mode show SPN+WiFi
 
                 String originalSpn = spn.trim();
                 spn = String.format(wfcVoiceSpnFormat, originalSpn);
                 dataSpn = String.format(wfcDataSpnFormat, originalSpn);
                 showSpn = true;
                 showPlmn = false;
-            } else if (!TextUtils.isEmpty(plmn) && !TextUtils.isEmpty(wfcVoiceSpnFormat)) {
-                // Show PLMN + Wi-Fi Calling if there is no valid SPN in the above case
-
-                String originalPlmn = plmn.trim();
-                plmn = String.format(wfcVoiceSpnFormat, originalPlmn);
             } else if (mSS.getVoiceRegState() == ServiceState.STATE_POWER_OFF
                     || (showPlmn && TextUtils.equals(spn, plmn))) {
                 // airplane mode or spn equals plmn, do not show spn
