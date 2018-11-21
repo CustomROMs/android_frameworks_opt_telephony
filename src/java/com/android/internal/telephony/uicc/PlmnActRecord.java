@@ -42,7 +42,7 @@ public class PlmnActRecord implements Parcelable {
     public final String plmn;
     public final int accessTechs;
 
-    private static final boolean VDBG = false;
+    private static final boolean VDBG = true;
 
     public static final Parcelable.Creator<PlmnActRecord> CREATOR =
             new Parcelable.Creator<PlmnActRecord>() {
