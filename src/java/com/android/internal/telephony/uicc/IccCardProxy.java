@@ -24,6 +24,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.Registrant;
 import android.os.RegistrantList;
+import android.os.SystemProperties;
 import android.os.UserHandle;
 import android.telephony.Rlog;
 import android.telephony.ServiceState;
@@ -543,8 +544,10 @@ public class IccCardProxy extends Handler implements IccCard {
             intent.putExtra(IccCardConstants.INTENT_KEY_ICC_STATE, value);
             intent.putExtra(IccCardConstants.INTENT_KEY_LOCKED_REASON, reason);
             intent.putExtra(PhoneConstants.PHONE_KEY, mPhoneId);  // SubId may not be valid.
+
             log("Sending intent ACTION_INTERNAL_SIM_STATE_CHANGED value=" + value
                     + " for mPhoneId : " + mPhoneId);
+            SystemProperties.set("gsm.sim_state", value);
             ActivityManager.broadcastStickyIntent(intent, UserHandle.USER_ALL);
         }
     }
