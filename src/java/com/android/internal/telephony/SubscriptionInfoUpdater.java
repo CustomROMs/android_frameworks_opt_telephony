@@ -36,6 +36,7 @@ import android.os.ParcelUuid;
 import android.os.PersistableBundle;
 import android.os.RemoteException;
 import android.os.ServiceManager;
+import android.os.SystemProperties;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.provider.Settings.Global;
@@ -1085,6 +1086,7 @@ public class SubscriptionInfoUpdater extends Handler {
         SubscriptionManager.putPhoneIdAndSubIdExtra(i, slotId);
         logd("Broadcasting intent ACTION_SIM_STATE_CHANGED " + state + " reason " + reason +
                 " for phone: " + slotId);
+        SystemProperties.set("gsm.sim_state", state);
         IntentBroadcaster.getInstance().broadcastStickyIntent(i, slotId);
     }
 
