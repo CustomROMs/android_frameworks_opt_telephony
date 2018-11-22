@@ -2234,23 +2234,29 @@ public class ServiceStateTracker extends Handler {
                 showPlmn = true;
                 if (mEmergencyOnly) {
                     // No service but emergency call allowed
+                    SystemProperties.set("gsm.status", "0");
                     plmn = Resources.getSystem().
                             getText(com.android.internal.R.string.emergency_calls_only).toString();
                 } else {
                     // No service at all
+                    SystemProperties.set("gsm.status", "1");
                     plmn = Resources.getSystem().
                             getText(com.android.internal.R.string.lockscreen_carrier_default).toString();
                 }
                 if (DBG) log("updateSpnDisplay: radio is on but out " +
                         "of service, set plmn='" + plmn + "'");
+
+		//SystemProperties.set("gsm.radioreset", "true");
             } else if (combinedRegState == ServiceState.STATE_IN_SERVICE) {
                 // In either home or roaming service
+                SystemProperties.set("gsm.status", "2");
                 plmn = mSS.getOperatorAlpha();
                 showPlmn = !TextUtils.isEmpty(plmn) &&
                         ((rule & SIMRecords.SPN_RULE_SHOW_PLMN)
                                 == SIMRecords.SPN_RULE_SHOW_PLMN);
             } else {
                 // Power off state, such as airplane mode, show plmn as "No service"
+                SystemProperties.set("gsm.status", "3");
                 showPlmn = true;
                 plmn = Resources.getSystem().
                         getText(com.android.internal.R.string.lockscreen_carrier_default).toString();
@@ -2298,6 +2304,7 @@ public class ServiceStateTracker extends Handler {
                     || !TextUtils.equals(dataSpn, mCurDataSpn)
                     || !TextUtils.equals(plmn, mCurPlmn)) {
                 if (DBG) {
+                    SystemProperties.set("gsm.plmn", plmn);
                     log(String.format("updateSpnDisplay: changed sending intent rule=" + rule +
                             " showPlmn='%b' plmn='%s' showSpn='%b' spn='%s' dataSpn='%s' " +
                             "subId='%d'", showPlmn, plmn, showSpn, spn, dataSpn, subId));
