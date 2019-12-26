@@ -80,6 +80,9 @@ public class SubscriptionInfoUpdater extends Handler {
     private static final int EVENT_REFRESH_EMBEDDED_SUBSCRIPTIONS = 12;
 
     private static final String ICCID_STRING_FOR_NO_SIM = "";
+
+    // Fake ICCID
+    private static final String FAKE_ICCID = "00000000000001";
     /**
      *  int[] sInsertSimState maintains all slots' SIM inserted status currently,
      *  it may contain 4 kinds of values:
@@ -483,29 +486,24 @@ public class SubscriptionInfoUpdater extends Handler {
         if (mIccId[slotId] != null && !mIccId[slotId].equals(ICCID_STRING_FOR_NO_SIM)) {
             logd("SIM" + (slotId + 1) + " hot plug out or error.");
         }
-        mIccId[slotId] = ICCID_STRING_FOR_NO_SIM;
+        mIccId[slotId] = FAKE_ICCID;
+
         if (isAllIccIdQueryDone()) {
             updateSubscriptionInfoByIccId();
         }
-        updateCarrierServices(slotId, IccCardConstants.INTENT_VALUE_ICC_ABSENT);
-        broadcastSimStateChanged(slotId, IccCardConstants.INTENT_VALUE_ICC_ABSENT, null);
-        broadcastSimCardStateChanged(slotId, TelephonyManager.SIM_STATE_ABSENT);
-        broadcastSimApplicationStateChanged(slotId, TelephonyManager.SIM_STATE_NOT_READY);
+	return;
     }
 
     protected void handleSimError(int slotId) {
         if (mIccId[slotId] != null && !mIccId[slotId].equals(ICCID_STRING_FOR_NO_SIM)) {
             logd("SIM" + (slotId + 1) + " Error ");
         }
-        mIccId[slotId] = ICCID_STRING_FOR_NO_SIM;
+        mIccId[slotId] = FAKE_ICCID;
+
         if (isAllIccIdQueryDone()) {
             updateSubscriptionInfoByIccId();
         }
-        updateCarrierServices(slotId, IccCardConstants.INTENT_VALUE_ICC_CARD_IO_ERROR);
-        broadcastSimStateChanged(slotId, IccCardConstants.INTENT_VALUE_ICC_CARD_IO_ERROR,
-                IccCardConstants.INTENT_VALUE_ICC_CARD_IO_ERROR);
-        broadcastSimCardStateChanged(slotId, TelephonyManager.SIM_STATE_CARD_IO_ERROR);
-        broadcastSimApplicationStateChanged(slotId, TelephonyManager.SIM_STATE_NOT_READY);
+	return;
     }
 
     /**
@@ -582,7 +580,7 @@ public class SubscriptionInfoUpdater extends Handler {
                     // no SIM inserted last time, but there is one SIM inserted now
                     mInsertSimState[i] = SIM_CHANGED;
                 }
-                oldIccId[i] = ICCID_STRING_FOR_NO_SIM;
+                oldIccId[i] = FAKE_ICCID;
                 logd("updateSubscriptionInfoByIccId: No SIM in slot " + i + " last time");
             }
         }

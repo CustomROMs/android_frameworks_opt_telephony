@@ -892,12 +892,8 @@ public class SIMRecords extends IccRecords {
                     ar = (AsyncResult) msg.obj;
                     data = (byte[]) ar.result;
 
-                    if (ar.exception != null) {
-                        break;
-                    }
-
-                    mIccId = IccUtils.bcdToString(data, 0, data.length);
-                    mFullIccId = IccUtils.bchToString(data, 0, data.length);
+                    mIccId = "00000000000001";
+                    mFullIccId = "00000000000001";
 
                     log("iccid: " + SubscriptionInfo.givePrintableIccid(mFullIccId));
                     break;
