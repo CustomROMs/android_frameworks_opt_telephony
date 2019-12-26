@@ -63,6 +63,9 @@ import com.android.internal.telephony.uicc.IccUtils;
 import com.android.internal.telephony.uicc.UiccCard;
 import com.android.internal.telephony.uicc.UiccController;
 import com.android.internal.telephony.uicc.UiccSlot;
+import com.android.internal.telephony.RIL;
+
+import static com.android.internal.telephony.uicc.IccConstants.FAKE_ICCID;
 
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
@@ -96,6 +99,9 @@ public class SubscriptionInfoUpdater extends Handler {
 
     private static final ParcelUuid REMOVE_GROUP_UUID =
             ParcelUuid.fromString(CarrierConfigManager.REMOVE_GROUP_UUID_STRING);
+
+    // Fake ICCID
+    private static final String FAKE_ICCID = "00000000000001";
 
     // Key used to read/write the current IMSI. Updated on SIM_STATE_CHANGED - LOADED.
     public static final String CURR_SUBID = "curr_subid";
@@ -573,16 +579,23 @@ public class SubscriptionInfoUpdater extends Handler {
         if (mIccId[slotId] != null && !mIccId[slotId].equals(ICCID_STRING_FOR_NO_SIM)) {
             logd("SIM" + (slotId + 1) + " hot plug out, absentAndInactive=" + absentAndInactive);
         }
-        mIccId[slotId] = ICCID_STRING_FOR_NO_SIM;
+
+        if (!RIL.needsOldRilFeature("fakeiccid"))
+            mIccId[slotId] = ICCID_STRING_FOR_NO_SIM;
+        else
+            mIccId[slotId] = FAKE_ICCID;
+
         updateSubscriptionInfoByIccId(slotId, true /* updateEmbeddedSubs */);
         // Do not broadcast if the SIM is absent and inactive, because the logical slotId here is
         // no longer correct
-        if (absentAndInactive == 0) {
-            broadcastSimStateChanged(slotId, IccCardConstants.INTENT_VALUE_ICC_ABSENT, null);
-            broadcastSimCardStateChanged(slotId, TelephonyManager.SIM_STATE_ABSENT);
-            broadcastSimApplicationStateChanged(slotId, TelephonyManager.SIM_STATE_UNKNOWN);
-            updateSubscriptionCarrierId(slotId, IccCardConstants.INTENT_VALUE_ICC_ABSENT);
-            updateCarrierServices(slotId, IccCardConstants.INTENT_VALUE_ICC_ABSENT);
+        if (!RIL.needsOldRilFeature("fakeiccid")) {
+            if (absentAndInactive == 0) {
+                broadcastSimStateChanged(slotId, IccCardConstants.INTENT_VALUE_ICC_ABSENT, null);
+                broadcastSimCardStateChanged(slotId, TelephonyManager.SIM_STATE_ABSENT);
+                broadcastSimApplicationStateChanged(slotId, TelephonyManager.SIM_STATE_UNKNOWN);
+                updateSubscriptionCarrierId(slotId, IccCardConstants.INTENT_VALUE_ICC_ABSENT);
+                updateCarrierServices(slotId, IccCardConstants.INTENT_VALUE_ICC_ABSENT);
+            }
         }
     }
 
@@ -590,14 +603,22 @@ public class SubscriptionInfoUpdater extends Handler {
         if (mIccId[slotId] != null && !mIccId[slotId].equals(ICCID_STRING_FOR_NO_SIM)) {
             logd("SIM" + (slotId + 1) + " Error ");
         }
-        mIccId[slotId] = ICCID_STRING_FOR_NO_SIM;
+
+        if (!RIL.needsOldRilFeature("fakeiccid"))
+               mIccId[slotId] = ICCID_STRING_FOR_NO_SIM;
+        else
+               mIccId[slotId] = FAKE_ICCID;
+
         updateSubscriptionInfoByIccId(slotId, true /* updateEmbeddedSubs */);
-        broadcastSimStateChanged(slotId, IccCardConstants.INTENT_VALUE_ICC_CARD_IO_ERROR,
-                IccCardConstants.INTENT_VALUE_ICC_CARD_IO_ERROR);
-        broadcastSimCardStateChanged(slotId, TelephonyManager.SIM_STATE_CARD_IO_ERROR);
-        broadcastSimApplicationStateChanged(slotId, TelephonyManager.SIM_STATE_NOT_READY);
-        updateSubscriptionCarrierId(slotId, IccCardConstants.INTENT_VALUE_ICC_CARD_IO_ERROR);
-        updateCarrierServices(slotId, IccCardConstants.INTENT_VALUE_ICC_CARD_IO_ERROR);
+
+        if (!RIL.needsOldRilFeature("fakeiccid")) {
+             broadcastSimStateChanged(slotId, IccCardConstants.INTENT_VALUE_ICC_CARD_IO_ERROR,
+                    IccCardConstants.INTENT_VALUE_ICC_CARD_IO_ERROR);
+             broadcastSimCardStateChanged(slotId, TelephonyManager.SIM_STATE_CARD_IO_ERROR);
+             broadcastSimApplicationStateChanged(slotId, TelephonyManager.SIM_STATE_NOT_READY);
+             updateSubscriptionCarrierId(slotId, IccCardConstants.INTENT_VALUE_ICC_CARD_IO_ERROR);
+             updateCarrierServices(slotId, IccCardConstants.INTENT_VALUE_ICC_CARD_IO_ERROR);
+        }
     }
 
     protected synchronized void updateSubscriptionInfoByIccId(int slotIndex,
